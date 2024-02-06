@@ -1,0 +1,112 @@
+# ------------------------------------------------------------------
+# DEP. ELECTRÓNICA, TELECOMUNICAÇÕES E INFORMÁTICA - Univ. Aveiro
+#         Teste Teórico 2 de IAC - 29 de Junho de 2020
+# 
+# ------------------------------------------------------------------
+# NOTA: Use este ficheiro para responder às questões 2a e 2b).
+# ------------------------------------------------ 
+# --------
+# 2b) cotação: 2,0 valores
+# ------------------- Código C -------------------
+# int isqrt(unsigned int n );
+# void main( void ) {
+# static char* msg = "; A raíz inteira é: " ;
+#  unsigned int r, n = 11564; 
+#     print_int10( n ); 
+#     print_str( msg ); 
+#     r = isqrt( n ); 	// call isqrt
+#     print_int10( r );  
+#     exit(); 
+# }
+# -------------------------------------------------
+# Registos:
+# ----------
+# Variável |  Registo(s)
+#    msg   |  $a0
+#    n 	   |  $a0
+#    r     |  $a0,$v0
+# -------------------	
+	.eqv	PRINT_INT10,1	
+	.eqv	PRINT_STR,4
+	.eqv	EXIT,10		
+#		
+	.data
+msg:	.asciiz	"; A raiz inteira é: "
+	.text
+	.globl main
+main:
+	li	$t1,11564	#int n = 11564
+	
+	move	$a0,$t1
+	li	$v0,1
+	syscall			#print_int10(n)
+	
+	la	$a0,msg
+	li	$v0,4
+	syscall			#print_str(msg)
+	
+	move	$a0,$t1
+	jal	isqrt
+	
+	move	$a0,$v0
+	li	$v0,1
+	syscall			#print_int10(r)
+	
+	li	$v0,10
+	syscall
+	
+	
+
+
+# --------
+# 2a) cotação: 4,0 valores
+# ------------------- Código C -------------------
+# unsigned int isqrt(unsigned int n ){
+#     unsigned int  smc,lgc;    
+#      if (n < 2) return n ;   
+#      smc = isqrt( n >> 2 ) << 1; 
+#      lgc = smc + 1;
+#      if ( lgc*lgc > n ) return smc;  
+#      return lgc ;   
+# }
+# -------------------------------------------------
+# Registos:
+# ----------
+# Variável |  Registo(s)
+#    n 	   |  $a0
+#    smc   |  $t0
+#    lgc   |  $t3
+#	   |
+# -------------------
+
+isqrt:
+	addi	$sp,$sp,-8	#reservar stack
+	sw	$ra,0($sp)	#salvar ra
+	sw	$a0,4($sp)	#salvar n
+	li	$t2,2		#t2 = 2
+	
+	bge	$a0,$t2,recur	#se n >= 2, recursivo
+	move	$v0,$a0		#else: return n
+	lw	$a0,4($sp)
+	lw	$ra,0($sp)
+	addi	$sp,$sp,8
+	jr	$ra	
+	
+recur:	srl	$a0,$a0,2	#$a0 = n>>2
+	jal	isqrt
+	sll	$t0,$v0,1	#$t0 = smc = sqrt(n>>2) << 1	
+	addi	$t3,$t0,1	#$t3 = lgc = smc +1
+	lw	$a0,4($sp)	#restore n
+	mul	$t4,$t3,$t3	#$t4 = lgc*lgc
+	
+	bge	$t4,$a0,retsmc	#if lgc*lgc > n ret smc
+	move	$v0,$t3		#else return lgc
+	lw	$ra,0($sp)	#restore ra
+	addi	$sp,$sp,8	#desalocar stack
+	jr	$ra
+	
+	
+retsmc:	move	$v0,$t0
+	lw	$ra,0($sp)	#restore $ra
+	addi	$sp,$sp,8	#desalocar stack
+	jr	$ra

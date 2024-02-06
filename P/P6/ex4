@@ -1,0 +1,29 @@
+###########cii #######################################################
+ 	.text
+ 	.globl main
+
+main: 	
+
+	li $t0, 0xF0000000	# $t0 = 0xF0000000 (inicial)
+	li $t1, 28		# $t1 = 28         (incial)
+	li $t2, 0xAF29C4E2	# $t2 = valor				
+				
+doWhile: 
+	and $t3, $t2, $t0
+	
+	srlv $a0, $t3, $t1
+	li $v0, 34
+	syscall			# Imprime o valor em Hexadecimal
+	
+	li $a0, ' '
+	li $v0, 11
+	syscall			# Imprime o espaco
+	
+	srl $t0, $t0, 4		# shift na mascara
+	subi $t1, $t1 , 4	# subtrai o valor do proximo shift por 4
+	
+	bne $t0, $0, doWhile	# Repetes o while até $t0 ser 0x00000000
+
+done: 	li $v0, 10 	
+ 	syscall 		# exit()
+	

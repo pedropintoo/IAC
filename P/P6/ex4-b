@@ -1,0 +1,41 @@
+# NAO FUNCIONA CORRETAMENTE !!!!
+###########cii #######################################################
+ 	.text
+ 	.globl main
+
+main: 	
+
+	li $t0, 0x28000000	# $t0 = 0x28000000 (inicial do while)
+	li $t1, 24		# $t1 = 27         (inicial do while)
+	li $t2, 0xAF29C4E2	# $t2 = valor				
+	
+	
+	andi $t3, $t2, 0xC0000000
+							
+	srl $a0, $t3, 27
+	li $v0, 1
+	syscall			# Imprime o valor em Octal
+	
+	li $a0, ' '
+	li $v0, 11
+	syscall			# Imprime o espaco
+				
+doWhile: 
+	and $t3, $t2, $t0
+	
+	srlv $a0, $t3, $t1
+	li $v0, 1
+	syscall			# Imprime o valor em Hexadecimal
+	
+	li $a0, ' '
+	li $v0, 11
+	syscall			# Imprime o espaco
+	
+	srl $t0, $t0, 3		# shift na mascara
+	subi $t1, $t1 , 3	# subtrai o valor do proximo shift por 4
+	
+	bne $t0, $0, doWhile	# Repetes o while até $t0 ser 0x00000000
+
+done: 	li $v0, 10 	
+ 	syscall 		# exit()
+	

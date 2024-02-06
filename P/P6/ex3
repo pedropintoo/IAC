@@ -1,0 +1,36 @@
+	 .data
+prompt: .asciiz "Introduza dois numeros:\n" 
+result: .asciiz "A soma dos numeros e: "
+
+##################################################################
+ 	.text
+ 	.globl main
+
+main: 	la $a0, prompt	
+	li $v0, 4
+	syscall			# Imprime o prompt
+	
+	li $v0, 5 
+	syscall			# Le o valor inteiro de a
+	
+	move $t0, $v0		# Guarda o valor de a em $t0
+	
+	li $v0, 5 
+	syscall			# Le o valor inteiro de b
+	
+	move $t1, $v0		# Guarda o valor de b em $t1
+	
+	add $t2, $t0, $t1	# Calcula a soma
+	
+	la $a0, result
+	li $v0, 4
+	syscall			# Imprime o result
+	
+	move $a0, $t2
+	li $v0, 36
+	syscall			# Imprime o valor da soma
+	
+	
+ 	li $v0, 10 	
+ 	syscall 		# exit()
+	
